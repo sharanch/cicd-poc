@@ -16,15 +16,9 @@ pipeline {
       }
     }
 
-    stage('Push to Docker Hub') {
+    stage('Run Container') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-          sh """
-            echo $PASS | docker login -u $USER --password-stdin
-            docker tag cicd-poc-image $USER/cicd-poc-image:latest
-            docker push $USER/cicd-poc-image:latest
-          """
-        }
+        sh 'docker run -d -p 5000:5000 --name cicd-poc-container cicd-poc-image'
       }
     }
 
@@ -32,6 +26,13 @@ pipeline {
       steps {
         echo 'Trigger deployment script or Helm chart here'
       }
+    }
+  }
+
+  post {
+    always {
+      echo 'Cleaning up workspace...'
+      cleanWs()
     }
   }
 }
