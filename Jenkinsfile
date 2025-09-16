@@ -25,12 +25,6 @@ pipeline {
       }
     }
 
-    stage('Deploy') {
-      steps {
-        echo 'Trigger deployment script or Helm chart here'
-      }
-    }
-  }
 
   post {
     always {
