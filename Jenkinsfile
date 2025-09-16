@@ -4,7 +4,7 @@ pipeline {
   stages {
     stage('Clone') {
       steps {
-        git 'https://github.com/your-username/cicd-poc.git'
+        git 'https://github.com/sharanch/cicd-poc.git'
       }
     }
 
