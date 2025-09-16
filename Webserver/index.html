@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .terminal-window {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        padding: 0;
+        overflow: hidden;
+      }
+      .terminal-header {
+        background-color: #333;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        justify-content: flex-start;
+      }
+      .terminal-button {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+      .close-btn { background-color: #ff5f56; }
+      .minimize-btn { background-color: #ffbd2e; }
+      .maximize-btn { background-color: #27c93f; }
+      .terminal-content {
+        padding: 1.5rem;
+      }
+      .task-item.completed span {
+        text-decoration: line-through;
+        color: #86efac;
+      }
+      body.light-mode {
+        background-color: #f0f4f8;
+        color: #1a202c;
+      }
+      body.light-mode .terminal-window {
+        background-color: #e0e0e0;
+        border-color: #ccc;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      body.light-mode .terminal-header {
+        background-color: #ccc;
+      }
+      body.light-mode .text-green-400 {
+        color: #1a202c;
+      }
+      body.light-mode .border-green-600 {
+        border-color: #e2e8f0;
+      }
+      body.light-mode .bg-green-600 {
+        background-color: #4c51bf;
+      }
+      body.light-mode .hover\:bg-green-700:hover {
+        background-color: #434190;
+      }
+      body.light-mode .placeholder-green-800::placeholder {
+        color: #a0aec0;
+      }
+      body.light-mode .border-green-500 {
+        border-color: #4299e1;
+      }
+      body.light-mode .task-item.completed.border-purple-500 {
+        border-color: #9f7aea;
+      }
+      body.light-mode .task-item.completed span {
+        color: #718096;
+      }
+      body.light-mode .shadow-xl {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      /* New styles for readable list items in light mode */
+      body.light-mode .task-item {
+        background-color: #ffffff;
+      }
+      body.light-mode .task-item:hover {
+        background-color: #f3f4f6;
+      }
+      body.light-mode .task-item span {
+        color: #1a202c;
+      }
+    </style>
+    <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico">
+</head>
+<body class="bg-gray-950 text-green-400 font-mono flex items-center justify-center min-h-screen p-4 transition-colors duration-300">
+
+  <div class="terminal-window rounded-2xl w-full max-w-xl transition-colors duration-300">
+    
+    <div class="terminal-header flex-shrink-0 rounded-t-2xl">
+      <div class="terminal-button close-btn"></div>
+      <div class="terminal-button minimize-btn"></div>
+      <div class="terminal-button maximize-btn"></div>
+      <div class="flex-grow"></div>
+      <button id="theme-toggle" class="p-1 rounded-full hover:bg-gray-700 transition duration-300 focus:outline-none">
+          <!-- Sun Icon for Light Mode -->
+          <svg id="sun-icon" class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zM12 4v2m0 12v2m8-8h2m-2-4h2M4 12H2m4 4h-2m14-8h-2"/>
+          </svg>
+          <!-- Moon Icon for Dark Mode -->
+          <svg id="moon-icon" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+            <path d="M21 12.79A9 9 0 1111.21 3.21a9 9 0 009.79 9.58z"></path>
+          </svg>
+      </button>
+    </div>
+
+    <div class="terminal-content p-6 md:p-8">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-green-400">./to-do-list</h1>
+      </div>
+  
+      <!-- Input Section -->
+      <div class="flex flex-col sm:flex-row gap-2 mb-6">
+        <input
+          id="task-input"
+          type="text"
+          placeholder="Add a new task..."
+          class="flex-1 p-3 rounded-lg border border-gray-700 bg-gray-800 text-green-400 placeholder-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+        >
+        <button
+          id="add-btn"
+          class="bg-green-600 hover:bg-green-700 text-black font-bold py-3 px-6 rounded-lg transition-colors shadow-md border-2 border-green-500"
+        >
+          Add Task
+        </button>
+      </div>
+  
+      <!-- Task List -->
+      <ul id="task-list" class="space-y-3">
+        <!-- Tasks will be dynamically added here -->
+      </ul>
+      <p>sharan@sre:~$ <a href="../../index.html" class="text-blue-400 hover:text-blue-300 transition duration-300">cd ..</a></p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const taskInput = document.getElementById('task-input');
+      const addBtn = document.getElementById('add-btn');
+      const taskList = document.getElementById('task-list');
+      const themeToggle = document.getElementById('theme-toggle');
+      const body = document.body;
+      const sunIcon = document.getElementById('sun-icon');
+      const moonIcon = document.getElementById('moon-icon');
+
+      // Load tasks from local storage
+      let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      renderTasks();
+
+      // Function to save and render tasks
+      function saveAndRenderTasks() {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        renderTasks();
+      }
+
+      // Function to render the tasks on the page
+      function renderTasks() {
+        taskList.innerHTML = '';
+        tasks.forEach((task, index) => {
+          const li = document.createElement('li');
+          li.dataset.index = index;
+          li.classList.add(
+            'task-item', 'flex', 'items-center', 'justify-between', 'p-4', 'rounded-lg', 'transition-colors', 'cursor-pointer', 'shadow-sm',
+            'hover:bg-gray-700', 'bg-gray-800', 'border-l-4'
+          );
+
+          if (task.completed) {
+            li.classList.add('completed', 'border-purple-500');
+          } else {
+            li.classList.add('border-green-500');
+          }
+
+          li.innerHTML = `
+            <span class="flex-1 text-lg">${task.text}</span>
+            <button class="delete-btn bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-colors ml-4 focus:outline-none focus:ring-2 focus:ring-red-500" aria-label="Delete task">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 11-2 0v6a1 1 0 112 0V8z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          `;
+          taskList.appendChild(li);
+        });
+      }
+
+      // Add a new task
+      addBtn.addEventListener('click', () => {
+        const taskText = taskInput.value.trim();
+        if (taskText) {
+          tasks.push({ text: taskText, completed: false });
+          taskInput.value = '';
+          saveAndRenderTasks();
+        }
+      });
+      
+      // Handle Enter key in the input field
+      taskInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+              addBtn.click();
+          }
+      });
+
+      // Handle clicks on list items (toggle complete or delete)
+      taskList.addEventListener('click', (e) => {
+        const item = e.target.closest('li');
+        if (!item) return;
+
+        const index = item.dataset.index;
+        
+        if (e.target.closest('.delete-btn')) {
+          // Delete task
+          tasks.splice(index, 1);
+        } else {
+          // Toggle completion
+          tasks[index].completed = !tasks[index].completed;
+        }
+        saveAndRenderTasks();
+      });
+      
+      // Theme toggle functionality
+      themeToggle.addEventListener('click', () => {
+        body.classList.toggle('light-mode');
+        
+        // Toggle icon visibility
+        if (body.classList.contains('light-mode')) {
+          sunIcon.style.display = 'block';
+          moonIcon.style.display = 'none';
+        } else {
+          sunIcon.style.display = 'none';
+          moonIcon.style.display = 'block';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
