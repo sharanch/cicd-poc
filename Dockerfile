@@ -4,4 +4,4 @@ COPY Webserver/requirements.txt .
 RUN pip install -r requirements.txt
 COPY Webserver/ .
 EXPOSE 5000
-CMD ["python", "app.py"]
+CMD ["python3", "app.py"]
