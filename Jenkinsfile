@@ -18,7 +18,10 @@ pipeline {
 
     stage('Run Container') {
       steps {
-        sh 'docker run -d -p 5000:5000 --name cicd-poc-container cicd-poc-image'
+        sh '''
+          docker rm -f cicd-poc-container || true
+          docker run -d -p 5000:5000 --name cicd-poc-container cicd-poc-image
+        '''
       }
     }
 
