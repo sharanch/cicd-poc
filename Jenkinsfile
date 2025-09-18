@@ -5,6 +5,8 @@ pipeline {
     stage('Clone') {
       steps {
         git branch: 'main', url: 'https://github.com/sharanch/cicd-poc.git'
+        // If private repo, use: 
+        // git branch: 'main', url: 'https://github.com/sharanch/cicd-poc.git', credentialsId: 'github-creds'
       }
     }
 
@@ -24,7 +26,7 @@ pipeline {
         '''
       }
     }
-
+  }
 
   post {
     always {
